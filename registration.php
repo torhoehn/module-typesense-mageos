@@ -1,7 +1,9 @@
 <?php
+declare(strict_types=1);
 
-\Magento\Framework\Component\ComponentRegistrar::register(
-    \Magento\Framework\Component\ComponentRegistrar::MODULE,
-    ':module-namespace_:module-name',
-    __DIR__ . '/src'
+use Magento\Framework\Component\ComponentRegistrar;
+
+ComponentRegistrar::register(
+    ComponentRegistrar::MODULE,
+    'mageos:typesense', __DIR__ . '/src'
 );

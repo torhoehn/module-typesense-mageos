@@ -1,12 +1,20 @@
 {
     "name": "mageos/typesense",
-    "description": ":description",
+    "description": "TypeSense integratio for Mage-OS",
     "type": "magento2-module",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author-name",
-            "email": ":author-email"
+            "name": "Torben Höhn",
+            "email": ""
+        },
+        {
+            "name": "David Lambauer",
+            "email": "david@run-as-root.sh"
+        },
+        {
+            "name": "Manuel Rühlke",
+            "email": ""
         }
     ],
     "minimum-stability": "stable",
@@ -15,39 +23,20 @@
             "registration.php"
         ],
         "psr-4": {
-            ":module-namespace\\:module-name\\": "src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            ":module-namespace\\:module-name\\": "tests/src"
+            "mageos\\typesense\\": "src"
         }
     },
     "repositories": [
         {
             "type": "composer",
-            "url": "https://repo.magento.com/"
+            "url": "https://repo.mage-os.org/"
         }
     ],
     "require": {
-        "php": ":php-constraint",
-        "magento/framework": ":framework-constraint"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "^6.0|^9.0",
-        "pds/skeleton": "^1.0",
-        "phpro/grumphp": "^v0.21.0",
-        "phpstan/phpstan": "^0.12.0",
-        "squizlabs/php_codesniffer": "^3.5",
-        "magento/magento-coding-standard": "@dev"
+        "roave/security-advisories": "dev-master"
     },
     "scripts": {
-        "post-install-cmd": [
-            "vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/"
-        ],
-        "post-update-cmd": [
-            "vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/"
-        ]
     }
 }
