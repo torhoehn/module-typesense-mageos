@@ -49,4 +49,20 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Index -->
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\Indexer\IndexerHandler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexStructureFactory">
+        <arguments>
+            <argument name="structures" xsi:type="array">
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\Indexer\IndexStructure</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
