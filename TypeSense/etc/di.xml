@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Elasticsearch\Model\Config">
         <arguments>
             <argument name="engineList" xsi:type="array">
@@ -22,6 +21,31 @@
         <arguments>
             <argument name="engineValidators" xsi:type="array">
                 <item name="typesense" xsi:type="object">MageOs\TypeSense\Setup\Validator</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Resolver -->
+    <type name="Magento\AdvancedSearch\Model\Client\ClientResolver">
+        <arguments>
+            <argument name="clientFactories" xsi:type="array">
+                <item name="typesense" xsi:type="string">\MageOs\TypeSense\Model\Client\TypeSenseFactory</item>
+            </argument>
+            <argument name="clientOptions" xsi:type="array">
+                <item name="typesense" xsi:type="string">\Magento\Elasticsearch\Model\Config</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="MageOs\TypeSense\Model\Client\TypeSenseFactory" type="Magento\AdvancedSearch\Model\Client\ClientFactory">
+        <arguments>
+            <argument name="clientClass" xsi:type="string">MageOs\TypeSense\Model\SearchClient</argument>
+            <argument name="typesense" xsi:type="string">MageOs\TypeSense\Model\TypeSense</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Client\ClientFactoryProxy">
+        <arguments>
+            <argument name="clientFactories" xsi:type="array">
+                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Client\TypeSenseFactory</item>
             </argument>
         </arguments>
     </type>
