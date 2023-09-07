@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="catalog">
+            <group id="search">
+                <field id="typesense_server_hostname" translate="label" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>TypeSense Server Hostname</label>
+                    <depends>
+                        <field id="engine">typesense</field>
+                    </depends>
+                </field>
+
+                <field id="typesense_server_port" translate="label" type="text" sortOrder="62" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>TypeSense Server Port</label>
+                    <depends>
+                        <field id="engine">typesense</field>
+                    </depends>
+                </field>
+
+                <field id="typesense_index_prefix" translate="label" type="text" sortOrder="63" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>TypeSense Index Prefix</label>
+                    <depends>
+                        <field id="engine">typesense</field>
+                    </depends>
+                </field>
+
+                <field id="typesense_api_key" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>TypeSense API Key</label>
+                    <depends>
+                        <field id="engine">typesense</field>
+                    </depends>
+                </field>
+
+                <field id="typesense_test_connect_wizard" translate="button_label" sortOrder="68" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label/>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>MageOs\TypeSense\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends>
+                        <field id="engine">typesense</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

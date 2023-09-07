@@ -23,7 +23,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "mageos\\typesense\\": "src"
+            "MageOs\\TypeSense\\": "src"
         }
     },
     "repositories": [

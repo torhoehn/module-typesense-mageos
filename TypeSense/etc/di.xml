@@ -18,4 +18,11 @@
         </arguments>
     </type>
 
+    <type name="Magento\Search\Model\SearchEngine\Validator">
+        <arguments>
+            <argument name="engineValidators" xsi:type="array">
+                <item name="typesense" xsi:type="object">MageOs\TypeSense\Setup\Validator</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
