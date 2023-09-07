@@ -1,5 +1,5 @@
 {
-    "name": ":vendor/:package",
+    "name": "mageos/typesense",
     "description": ":description",
     "type": "magento2-module",
     "license": "MIT",
