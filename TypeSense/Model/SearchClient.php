@@ -109,17 +109,12 @@ class SearchClient implements ClientInterface
             $protocol = 'http';
         }
 
-        $authString = '';
-        if (!empty($options['enableAuth']) && (int) $options['enableAuth'] === 1) {
-            $authString = "{$options['username']}:{$options['password']}@";
-        }
-
         $portString = '';
         if (!empty($options['port'])) {
-            $portString = ':'.$options['port'];
+            $portString = ':' . $options['port'];
         }
 
-        $host = $protocol.'://'.$authString.$hostname.$portString;
+        $host = $protocol . '://' . $hostname . $portString;
 
         $options['hosts'] = [$host];
 
