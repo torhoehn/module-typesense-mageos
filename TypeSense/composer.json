@@ -15,6 +15,10 @@
         {
             "name": "Manuel Rühlke",
             "email": ""
+        },
+        {
+            "name": "Cristiano Pacheco",
+            "email": "cristiano@run-as-root.sh"
         }
     ],
     "minimum-stability": "stable",
@@ -23,7 +27,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "MageOs\\TypeSense\\": "src"
+            "MageOs\\TypeSense\\": ""
         }
     },
     "repositories": [
