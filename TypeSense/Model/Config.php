@@ -49,7 +49,7 @@ class Config implements ClientOptionsInterface {
             'hostname' => $this->getTypesenseConfigData('server_hostname'),
             'port' => $this->getTypesenseConfigData('server_port'),
             'index' => $this->getTypesenseConfigData('index_prefix'),
-            'enableAuth' => $this->getTypesenseConfigData('api_key'),
+            'api_key' => $this->getTypesenseConfigData('api_key'),
         ];
         $options = array_merge($defaultOptions, $options);
         $allowedOptions = array_merge(array_keys($defaultOptions), ['engine']);
