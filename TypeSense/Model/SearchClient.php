@@ -8,16 +8,17 @@ use Magento\Elasticsearch\Model\Adapter\FieldsMappingPreprocessorInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\OpenSearch\Model\Adapter\DynamicTemplatesProvider;
-use OpenSearch\Client;
-use OpenSearch\ClientBuilder;
+use MageOs\TypeSense\SearchAdapter\DynamicTemplatesProvider;
+use TypeSense\Client;
+//use TypeSense\ClientBuilder;
 
 class SearchClient implements ClientInterface
 {
     private array $clientOptions;
     private array $client;
-    private bool $pingResult;
+    private bool $pingResult = true;
     private array $fieldsMappingPreprocessors;
+
     /**
      * @var DynamicTemplatesProvider|null
      */
@@ -28,21 +29,19 @@ class SearchClient implements ClientInterface
      */
     public function __construct(
         $options = [],
-        $openSearchClient = null,
+        $typeSenseClient = null,
         $fieldsMappingPreprocessors = [],
         ?DynamicTemplatesProvider $dynamicTemplatesProvider = null
     ) {
-        if (empty($options['hostname'])
-            || ((!empty($options['enableAuth']) && ($options['enableAuth'] == 1))
-                && (empty($options['username']) || empty($options['password'])))
+        if (empty($options['hostname']) || empty($options['api_key']) || empty($options['port'])
         ) {
             throw new LocalizedException(
                 __('The search failed because of a search engine misconfiguration.')
             );
         }
         // phpstan:ignore
-        if ($openSearchClient instanceof Client) {
-            $this->client[getmypid()] = $openSearchClient;
+        if ($typeSenseClient instanceof Client) {
+            $this->client[getmypid()] = $typeSenseClient;
         }
         $this->clientOptions = $options;
         $this->fieldsMappingPreprocessors = $fieldsMappingPreprocessors;
@@ -59,7 +58,7 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Get OS Client
+     * Get TypeSense Client
      */
     public function getTypeSenseClient(): Client
     {
@@ -80,7 +79,7 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Validate connection params for OpenSearch
+     * Validate connection params for TypeSense
      */
     public function testConnection(): bool
     {
@@ -88,7 +87,7 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Build config for OpenSearch
+     * Build config for TypeSense
      */
     private function buildOSConfig(array $options = []): array
     {
@@ -139,7 +138,7 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Add/update an Elasticsearch index settings.
+     * Add/update an TypeSense index settings.
      *
      */
     public function putIndexSettings(string $index, array $settings): void
@@ -162,16 +161,12 @@ class SearchClient implements ClientInterface
 
     /**
      * Check if index is empty.
-     *
      */
     public function isEmptyIndex(string $index): bool
     {
         $stats = $this->getTypeSenseClient()->indices()->stats(['index' => $index, 'metric' => 'docs']);
-        if ($stats['indices'][$index]['primaries']['docs']['count'] === 0) {
-            return true;
-        }
 
-        return false;
+        return $stats['indices'][$index]['primaries']['docs']['count'] === 0;
     }
 
     /**
@@ -194,19 +189,11 @@ class SearchClient implements ClientInterface
         $this->getTypeSenseClient()->indices()->updateAliases($params);
     }
 
-    /**
-     * Checks whether OpenSearch index exists
-     *
-     */
     public function indexExists(string $index): bool
     {
         return $this->getTypeSenseClient()->indices()->exists(['index' => $index]);
     }
 
-    /**
-     * Exists alias.
-     *
-     */
     public function existsAlias(string $alias, string $index = ''): bool
     {
         $params = ['name' => $alias];
@@ -217,17 +204,13 @@ class SearchClient implements ClientInterface
         return $this->getTypeSenseClient()->indices()->existsAlias($params);
     }
 
-    /**
-     * Get alias.
-     *
-     */
     public function getAlias(string $alias): array
     {
         return $this->getTypeSenseClient()->indices()->getAlias(['name' => $alias]);
     }
 
     /**
-     * Add mapping to OpenSearch index
+     * Add mapping to TypeSense index
      *
      * @throws InvalidArgumentException
      */
@@ -252,28 +235,16 @@ class SearchClient implements ClientInterface
         $this->getTypeSenseClient()->indices()->putMapping($params);
     }
 
-    /**
-     * Execute search by $query
-     *
-     */
     public function query(array $query): array
     {
         return $this->getTypeSenseClient()->search($query);
     }
 
-    /**
-     * Get mapping from Elasticsearch index.
-     *
-     */
     public function getMapping(array $params): array
     {
         return $this->getTypeSenseClient()->indices()->getMapping($params);
     }
 
-    /**
-     * Delete mapping in OpenSearch index
-     *
-     */
     public function deleteMapping(string $index, string $entityType): void
     {
         $this->getTypeSenseClient()->indices()->deleteMapping(
@@ -284,10 +255,6 @@ class SearchClient implements ClientInterface
         );
     }
 
-    /**
-     * Apply fields mapping preprocessors
-     *
-     */
     public function applyFieldsMappingPreprocessors(array $properties): array
     {
         foreach ($this->fieldsMappingPreprocessors as $preprocessor) {
