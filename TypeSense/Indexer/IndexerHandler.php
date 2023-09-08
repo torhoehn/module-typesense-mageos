@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageOs\TypeSense\Indexer;
 
 use Magento\Catalog\Model\Category;
