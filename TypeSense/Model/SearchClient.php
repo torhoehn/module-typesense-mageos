@@ -1,62 +1,61 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOs\TypeSense\Model;
 
+use Http\Client\Exception;
 use Magento\AdvancedSearch\Model\Client\ClientInterface;
-use Magento\Elasticsearch\Model\Adapter\FieldsMappingPreprocessorInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
 use MageOs\TypeSense\Builder\TypeSenseClientBuilder;
-use MageOs\TypeSense\Data\NodeData;
 use MageOs\TypeSense\Data\TypeSenseConfigData;
-use MageOs\TypeSense\Data\TypeSenseConfigDataFactory;
-use MageOs\TypeSense\Enum\ProtocolEnum;
+use MageOs\TypeSense\Exception\ConfigurationException;
+use MageOs\TypeSense\Exception\InvalidConfigurationException;
+use MageOs\TypeSense\Mapper\TypeSenseConfigDataMapper;
 use MageOs\TypeSense\SearchAdapter\DynamicTemplatesProvider;
 use TypeSense\Client;
 
-//use TypeSense\ClientBuilder;
-
 class SearchClient implements ClientInterface
 {
-    private array $clientOptions;
-    private array $client;
-    private bool $pingResult = true;
-    private array $fieldsMappingPreprocessors;
-
-    /**
-     * @var DynamicTemplatesProvider|null
-     */
-    public mixed $dynamicTemplatesProvider;
-    private TypeSenseClientBuilder $clientBuilder;
+    /** @var Client[] */
+    private array $client = [];
+    private TypeSenseConfigData $typeSenseConfigData;
 
     /**
      * @throws LocalizedException
      */
     public function __construct(
-        $options = [],
-        TypeSenseClientBuilder $clientBuilder,
-        $fieldsMappingPreprocessors = [],
-        ?DynamicTemplatesProvider $dynamicTemplatesProvider = null
+        private readonly TypeSenseClientBuilder $clientBuilder,
+        private readonly TypeSenseConfigDataMapper $typeSenseConfigDataMapper,
+        private ?DynamicTemplatesProvider $dynamicTemplatesProvider = null,
+        private $fieldsMappingPreprocessors = [],
+        $options = []
     ) {
-        if (empty($options['hostname']) || empty($options['api_key']) || empty($options['port'])) {
-            throw new LocalizedException(
-                __('The search failed because of a search engine misconfiguration.')
-            );
-        }
-        $typeSenseConfig = new TypeSenseConfigData($options['api_key'], [
-            new NodeData($options['hostname'], $options['port'], ProtocolEnum::HTTP)
-        ]);
-        $typeSenseClient = $clientBuilder->build($typeSenseConfig);
-        $this->client[] = $typeSenseClient;
+        $pid = getmypid();
+        if (!array_key_exists($pid, $this->client)) {
+            if (empty($options['hostname']) || empty($options['api_key']) || empty($options['port'])) {
+                throw new LocalizedException(
+                    __('The search failed because of a search engine misconfiguration.')
+                );
+            }
 
-        // phpstan:ignore
-        $this->client[getmypid()] = $typeSenseClient;
-        $this->clientOptions = $options;
-        $this->fieldsMappingPreprocessors = $fieldsMappingPreprocessors;
-        $this->dynamicTemplatesProvider = $dynamicTemplatesProvider ?: ObjectManager::getInstance()
-            ->get(DynamicTemplatesProvider::class);
+            $typeSenseConfig = $this->typeSenseConfigDataMapper->map(
+                hostname: $options['hostname'],
+                apiKey: $options['api_key'],
+                port: (int)$options['port']
+            );
+
+            $typeSenseClient = $clientBuilder->build($typeSenseConfig);
+
+            // phpstan:ignore
+            $this->client[getmypid()] = $typeSenseClient;
+            $this->typeSenseConfigData = $typeSenseConfig;
+        }
+
+        $this->dynamicTemplatesProvider = $dynamicTemplatesProvider ?:
+            ObjectManager::getInstance()->get(DynamicTemplatesProvider::class);
     }
 
     /**
@@ -68,57 +67,40 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Get TypeSense Client
+     * @throws ConfigurationException
+     * @throws InvalidConfigurationException
      */
     public function getTypeSenseClient(): Client
     {
         $pid = getmypid();
-        if (!isset($this->client[$pid])) {
-            $config = $this->buildOSConfig($this->clientOptions);
-            $this->client[$pid] = ClientBuilder::fromConfig($config, true);
+        if (!array_key_exists($pid, $this->client)) {
+            $this->client[$pid] = $this->clientBuilder->build($this->typeSenseConfigData);
         }
         return $this->client[$pid];
     }
 
     /**
      * Ping the client
+     *
+     * @throws Exception
      */
     public function ping(): bool
     {
-        return $this->pingResult;
+        try {
+            $result = $this->getTypeSenseClient()->getHealth()->retrieve();
+            return $result['ok'] ?? false;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**
      * Validate connection params for TypeSense
+     * @throws Exception
      */
     public function testConnection(): bool
     {
         return $this->ping();
-    }
-
-    /**
-     * Build config for TypeSense
-     */
-    private function buildOSConfig(array $options = []): array
-    {
-        $hostname = preg_replace('/http[s]?:\/\//i', '', $options['hostname']);
-        // @codingStandardsIgnoreStart
-        $protocol = parse_url($options['hostname'], PHP_URL_SCHEME);
-        // @codingStandardsIgnoreEnd
-        if (!$protocol) {
-            $protocol = 'http';
-        }
-
-        $portString = '';
-        if (!empty($options['port'])) {
-            $portString = ':' . $options['port'];
-        }
-
-        $host = $protocol . '://' . $hostname . $portString;
-
-        $options['hosts'] = [$host];
-
-        return $options;
     }
 
     /**
