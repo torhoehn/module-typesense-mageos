@@ -26,7 +26,7 @@ class Validator implements ValidatorInterface
                     . ' Verify that the host and port are configured correctly.';
             }
         } catch (\Exception $e) {
-            $errors[] = 'Could not validate a connection to the OpenSearch. ' . $e->getMessage();
+            $errors[] = 'Could not validate a connection to the Typesense. ' . $e->getMessage();
         }
         return $errors;
     }

@@ -32,7 +32,7 @@
                 <item name="typesense" xsi:type="string">\MageOs\TypeSense\Model\Client\TypeSenseFactory</item>
             </argument>
             <argument name="clientOptions" xsi:type="array">
-                <item name="typesense" xsi:type="string">\Magento\Elasticsearch\Model\Config</item>
+                <item name="typesense" xsi:type="string">\MageOs\TypeSense\Model\Config</item>
             </argument>
         </arguments>
     </type>
