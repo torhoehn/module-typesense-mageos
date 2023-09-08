@@ -39,7 +39,7 @@ class TypeSenseClientBuilder
         try {
             return new Client($data);
         } catch (ConfigError $e) {
-            throw new ConfigurationException('Invalid configuration: ' . $e->getMessage());
+            throw new ConfigurationException(new Phrase(__('Invalid configuration: %1', $e->getMessage())));
         }
     }
 }
