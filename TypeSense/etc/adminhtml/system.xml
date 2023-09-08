@@ -3,8 +3,10 @@
     <system>
         <section id="catalog">
             <group id="search">
-                <field id="typesense_server_hostname" translate="label" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
+                <field id="typesense_server_hostname" translate="label, comment" type="text" sortOrder="61" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>TypeSense Server Hostname</label>
+                    <comment>Hostname or IP address. Ex: localhost, 127.0.0.1</comment>
+                    <validate>required-entry</validate>
                     <depends>
                         <field id="engine">typesense</field>
                     </depends>
@@ -12,13 +14,13 @@
 
                 <field id="typesense_server_port" translate="label" type="text" sortOrder="62" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>TypeSense Server Port</label>
+                    <validate>validate-greater-than-zero validate-number required-entry</validate>
                     <depends>
                         <field id="engine">typesense</field>
                     </depends>
                 </field>
 
-                <field id="typesense_index_prefix" translate="label" type="text" sortOrder="63" showInDefault="1"
-                       showInWebsite="0" showInStore="0">
+                <field id="typesense_index_prefix" translate="label" type="text" sortOrder="63" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>TypeSense Index Prefix</label>
                     <depends>
                         <field id="engine">typesense</field>
@@ -27,6 +29,7 @@
 
                 <field id="typesense_api_key" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>TypeSense API Key</label>
+                    <validate>required-entry</validate>
                     <depends>
                         <field id="engine">typesense</field>
                     </depends>
