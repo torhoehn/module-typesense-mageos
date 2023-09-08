@@ -8,42 +8,30 @@ use Magento\AdvancedSearch\Model\Client\ClientResolver;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Search\EngineResolverInterface;
 use Magento\Store\Model\ScopeInterface;
+use function in_array;
 
 class Config implements ClientOptionsInterface {
     const ENGINE_NAME = 'typesense';
 
-    protected $scopeConfig;
-
-    private $prefix;
-
-    private $clientResolver;
-
-    private $engineResolver;
-
-    private $engineList;
+    private string $prefix;
+    private array $engineList;
 
     /**
-     * @param ScopeConfigInterface $scopeConfig
-     * @param ClientResolver $clientResolver
-     * @param EngineResolverInterface $engineResolver
      * @param string|null $prefix
      * @param array $engineList
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        ClientResolver $clientResolver,
-        EngineResolverInterface $engineResolver,
+        protected ScopeConfigInterface $scopeConfig,
+        private ClientResolver $clientResolver,
+        private EngineResolverInterface $engineResolver,
         $prefix = null,
         $engineList = []
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->clientResolver = $clientResolver;
-        $this->engineResolver = $engineResolver;
         $this->prefix = $prefix ?: $this->clientResolver->getCurrentEngine();
         $this->engineList = $engineList;
     }
 
-    public function prepareClientOptions($options = [])
+    public function prepareClientOptions($options = []): array
     {
         $defaultOptions = [
             'hostname' => $this->getTypesenseConfigData('server_hostname'),
@@ -54,13 +42,13 @@ class Config implements ClientOptionsInterface {
         $options = array_merge($defaultOptions, $options);
         $allowedOptions = array_merge(array_keys($defaultOptions), ['engine']);
 
-        return array_filter(
-            $options,
-            function (string $key) use ($allowedOptions) {
-                return in_array($key, $allowedOptions);
-            },
-            ARRAY_FILTER_USE_KEY
-        );
+        $array_filter = [];
+        foreach ($options as $key => $item) {
+            if (in_array($key, $allowedOptions, true)) {
+                $array_filter[$key] = $item;
+            }
+        }
+        return $array_filter;
     }
 
     public function getTypesenseConfigData($field, $storeId = null)
@@ -74,9 +62,9 @@ class Config implements ClientOptionsInterface {
         return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
-    public function isTypesenseEnabled()
+    public function isTypesenseEnabled(): bool
     {
-        return in_array($this->engineResolver->getCurrentSearchEngine(), $this->engineList);
+        return in_array($this->engineResolver->getCurrentSearchEngine(), $this->engineList, true);
     }
 
     public function getIndexPrefix()

@@ -8,8 +8,14 @@ use Magento\Elasticsearch\Model\Adapter\FieldsMappingPreprocessorInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InvalidArgumentException;
 use Magento\Framework\Exception\LocalizedException;
+use MageOs\TypeSense\Builder\TypeSenseClientBuilder;
+use MageOs\TypeSense\Data\NodeData;
+use MageOs\TypeSense\Data\TypeSenseConfigData;
+use MageOs\TypeSense\Data\TypeSenseConfigDataFactory;
+use MageOs\TypeSense\Enum\ProtocolEnum;
 use MageOs\TypeSense\SearchAdapter\DynamicTemplatesProvider;
 use TypeSense\Client;
+
 //use TypeSense\ClientBuilder;
 
 class SearchClient implements ClientInterface
@@ -23,26 +29,30 @@ class SearchClient implements ClientInterface
      * @var DynamicTemplatesProvider|null
      */
     public mixed $dynamicTemplatesProvider;
+    private TypeSenseClientBuilder $clientBuilder;
 
     /**
      * @throws LocalizedException
      */
     public function __construct(
         $options = [],
-        $typeSenseClient = null,
+        TypeSenseClientBuilder $clientBuilder,
         $fieldsMappingPreprocessors = [],
         ?DynamicTemplatesProvider $dynamicTemplatesProvider = null
     ) {
-        if (empty($options['hostname']) || empty($options['api_key']) || empty($options['port'])
-        ) {
+        if (empty($options['hostname']) || empty($options['api_key']) || empty($options['port'])) {
             throw new LocalizedException(
                 __('The search failed because of a search engine misconfiguration.')
             );
         }
+        $typeSenseConfig = new TypeSenseConfigData($options['api_key'], [
+            new NodeData($options['hostname'], $options['port'], ProtocolEnum::HTTP)
+        ]);
+        $typeSenseClient = $clientBuilder->build($typeSenseConfig);
+        $this->client[] = $typeSenseClient;
+
         // phpstan:ignore
-        if ($typeSenseClient instanceof Client) {
-            $this->client[getmypid()] = $typeSenseClient;
-        }
+        $this->client[getmypid()] = $typeSenseClient;
         $this->clientOptions = $options;
         $this->fieldsMappingPreprocessors = $fieldsMappingPreprocessors;
         $this->dynamicTemplatesProvider = $dynamicTemplatesProvider ?: ObjectManager::getInstance()
@@ -100,16 +110,16 @@ class SearchClient implements ClientInterface
         }
 
         $authString = '';
-        if (!empty($options['enableAuth']) && (int)$options['enableAuth'] === 1) {
+        if (!empty($options['enableAuth']) && (int) $options['enableAuth'] === 1) {
             $authString = "{$options['username']}:{$options['password']}@";
         }
 
         $portString = '';
         if (!empty($options['port'])) {
-            $portString = ':' . $options['port'];
+            $portString = ':'.$options['port'];
         }
 
-        $host = $protocol . '://' . $authString . $hostname . $portString;
+        $host = $protocol.'://'.$authString.$hostname.$portString;
 
         $options['hosts'] = [$host];
 

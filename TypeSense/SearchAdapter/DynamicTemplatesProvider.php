@@ -12,22 +12,15 @@ use MageOs\TypeSense\SearchAdapter\DynamicTemplates\MapperInterface;
 class DynamicTemplatesProvider
 {
     /**
-     * @var array
-     */
-    private $mappers;
-
-    /**
      * @param MapperInterface[] $mappers
      */
-    public function __construct(array $mappers)
+    public function __construct(private array $mappers)
     {
-        $this->mappers = $mappers;
     }
 
     /**
      * Get Search Engine dynamic templates.
      *
-     * @return array
      * @throws InvalidArgumentException
      */
     public function getTemplates(): array
