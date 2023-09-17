@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Magento\Elasticsearch\Model\Config">
+    <type name="MageOs\TypeSense\Model\Config">
         <arguments>
             <argument name="engineList" xsi:type="array">
                 <item name="typesense" xsi:type="string">typesense</item>
@@ -25,58 +25,73 @@
         </arguments>
     </type>
 
-    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapperProxy">
+    <type name="MageOS\TypeSense\SearchAdapter\ConnectionManager">
         <arguments>
-            <argument name="productFieldMappers" xsi:type="array">
-                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Adapter\FieldMapper\ProductFieldMapper</item>
+            <argument name="clientFactory" xsi:type="object">MageOs\TypeSense\Proxy\ClientFactoryProxy</argument>
+            <argument name="clientConfig" xsi:type="object">MageOs\TypeSense\Model\Config</argument>
+        </arguments>
+    </type>
+
+    <type name="MageOs\TypeSense\Proxy\ClientFactoryProxy">
+        <arguments>
+            <argument name="clientFactories" xsi:type="array">
+                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Client\ClientFactory</item>
             </argument>
         </arguments>
     </type>
-    <virtualType name="MageOs\TypeSense\Model\Adapter\FieldMapper\ProductFieldMapper"
-                 type="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapper">
+
+    <virtualType name="MageOs\TypeSense\Model\Client\ClientFactory" type="Magento\AdvancedSearch\Model\Client\ClientFactory">
         <arguments>
-            <argument name="fieldProvider" xsi:type="object">elasticsearch5FieldProvider</argument>
-            <argument name="fieldNameResolver" xsi:type="object">\MageOs\TypeSense\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver</argument>
+            <argument name="clientClass" xsi:type="string">MageOs\TypeSense\SearchAdapter\SearchClient</argument>
         </arguments>
     </virtualType>
-    <virtualType name="\MageOs\TypeSense\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver"
-                 type="\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver">
-        <arguments>
-            <argument name="items" xsi:type="array">
-                <item name="notEav" xsi:type="object" sortOrder="10">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\NotEavAttribute</item>
-                <item name="special" xsi:type="object" sortOrder="20">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\SpecialAttribute</item>
-                <item name="price" xsi:type="object" sortOrder="30">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\Price</item>
-                <item name="categoryName" xsi:type="object" sortOrder="40">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CategoryName</item>
-                <item name="position" xsi:type="object" sortOrder="50">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\Position</item>
-                <item name="default" xsi:type="object" sortOrder="100">\MageOs\TypeSense\SearchAdapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\DefaultResolver</item>
-            </argument>
-        </arguments>
-    </virtualType>
+
+<!--    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapperProxy">-->
+<!--        <arguments>-->
+<!--            <argument name="productFieldMappers" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Adapter\FieldMapper\ProductFieldMapper</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
+<!--    <virtualType name="MageOs\TypeSense\Model\Adapter\FieldMapper\ProductFieldMapper"-->
+<!--                 type="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapper">-->
+<!--        <arguments>-->
+<!--            <argument name="fieldProvider" xsi:type="object">elasticsearch5FieldProvider</argument>-->
+<!--            <argument name="fieldNameResolver" xsi:type="object">\MageOs\TypeSense\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver</argument>-->
+<!--        </arguments>-->
+<!--    </virtualType>-->
+<!--    <virtualType name="\MageOs\TypeSense\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver"-->
+<!--                 type="\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CompositeResolver">-->
+<!--        <arguments>-->
+<!--            <argument name="items" xsi:type="array">-->
+<!--                <item name="notEav" xsi:type="object" sortOrder="10">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\NotEavAttribute</item>-->
+<!--                <item name="special" xsi:type="object" sortOrder="20">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\SpecialAttribute</item>-->
+<!--                <item name="price" xsi:type="object" sortOrder="30">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\Price</item>-->
+<!--                <item name="categoryName" xsi:type="object" sortOrder="40">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\CategoryName</item>-->
+<!--                <item name="position" xsi:type="object" sortOrder="50">\Magento\Elasticsearch\Model\Adapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\Position</item>-->
+<!--                <item name="default" xsi:type="object" sortOrder="100">\MageOs\TypeSense\SearchAdapter\FieldMapper\Product\FieldProvider\FieldName\Resolver\DefaultResolver</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </virtualType>-->
 
     <!-- Resolver -->
     <type name="Magento\AdvancedSearch\Model\Client\ClientResolver">
         <arguments>
             <argument name="clientFactories" xsi:type="array">
-                <item name="typesense" xsi:type="string">\MageOs\TypeSense\Model\Client\TypeSenseFactory</item>
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\Model\Client\ClientFactory</item>
             </argument>
             <argument name="clientOptions" xsi:type="array">
-                <item name="typesense" xsi:type="string">\MageOs\TypeSense\Model\Config</item>
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\Model\Config</item>
             </argument>
         </arguments>
     </type>
-    <virtualType name="MageOs\TypeSense\Model\Client\TypeSenseFactory" type="Magento\AdvancedSearch\Model\Client\ClientFactory">
-        <arguments>
-            <argument name="clientClass" xsi:type="string">MageOs\TypeSense\Model\SearchClient</argument>
-            <argument name="typesense" xsi:type="string">MageOs\TypeSense\Model\TypeSense</argument>
-        </arguments>
-    </virtualType>
-    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Client\ClientFactoryProxy">
-        <arguments>
-            <argument name="clientFactories" xsi:type="array">
-                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Client\TypeSenseFactory</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Client\ClientFactoryProxy">-->
+<!--        <arguments>-->
+<!--            <argument name="clientFactories" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="object">MageOs\TypeSense\Model\Client\TypeSenseFactory</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
     <!-- Index -->
     <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
@@ -94,30 +109,30 @@
         </arguments>
     </type>
 
-    <type name="Magento\Elasticsearch\Model\Adapter\Elasticsearch">
-        <arguments>
-            <argument name="responseErrorExceptionList" xsi:type="array">
-                <item name="typesenseMissing404" xsi:type="string">MageOs\TypeSense\Exceptions\Missing404Exception</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\Elasticsearch\Model\Adapter\Elasticsearch">-->
+<!--        <arguments>-->
+<!--            <argument name="responseErrorExceptionList" xsi:type="array">-->
+<!--                <item name="typesenseMissing404" xsi:type="string">MageOs\TypeSense\Exceptions\Missing404Exception</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
     <!-- Fixes -->
-    <type name="Magento\Framework\Search\Dynamic\IntervalFactory">
-        <arguments>
-            <argument name="intervals" xsi:type="array">
-                <item name="typesense" xsi:type="string">Magento\Elasticsearch\Elasticsearch5\SearchAdapter\Aggregation\Interval</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\Framework\Search\Dynamic\IntervalFactory">-->
+<!--        <arguments>-->
+<!--            <argument name="intervals" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="string">Magento\Elasticsearch\Elasticsearch5\SearchAdapter\Aggregation\Interval</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
-    <type name="Magento\Framework\Search\Dynamic\DataProviderFactory">
-        <arguments>
-            <argument name="dataProviders" xsi:type="array">
-                <item name="typesense" xsi:type="string">Magento\Elasticsearch\SearchAdapter\Dynamic\DataProvider</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\Framework\Search\Dynamic\DataProviderFactory">-->
+<!--        <arguments>-->
+<!--            <argument name="dataProviders" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="string">Magento\Elasticsearch\SearchAdapter\Dynamic\DataProvider</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
     <type name="MageOs\TypeSense\SearchAdapter\DynamicTemplatesProvider">
         <arguments>
@@ -130,14 +145,14 @@
         </arguments>
     </type>
 
-    <type name="MageOs\TypeSense\Model\SearchClient">
-        <arguments>
-            <argument name="fieldsMappingPreprocessors" xsi:type="array">
-                <item name="typesense_copy_searchable_fields_to_search_field" xsi:type="object">Magento\Elasticsearch\Model\Adapter\FieldMapper\CopySearchableFieldsToSearchField</item>
-                <item name="typesense_add_default_search_field" xsi:type="object">Magento\Elasticsearch\Model\Adapter\FieldMapper\AddDefaultSearchField</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="MageOs\TypeSense\SearchAdapter\SearchClient">-->
+<!--        <arguments>-->
+<!--            <argument name="fieldsMappingPreprocessors" xsi:type="array">-->
+<!--                <item name="typesense_copy_searchable_fields_to_search_field" xsi:type="object">Magento\Elasticsearch\Model\Adapter\FieldMapper\CopySearchableFieldsToSearchField</item>-->
+<!--                <item name="typesense_add_default_search_field" xsi:type="object">Magento\Elasticsearch\Model\Adapter\FieldMapper\AddDefaultSearchField</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
     <!-- Engine -->
     <type name="Magento\Search\Model\EngineResolver">
@@ -151,7 +166,7 @@
     <type name="Magento\CatalogSearch\Model\ResourceModel\EngineProvider">
         <arguments>
             <argument name="engines" xsi:type="array">
-                <item name="typesense" xsi:type="string">Magento\Elasticsearch\Model\ResourceModel\Engine</item>
+                <item name="typesense" xsi:type="string">MageOs\Typesense\Search\Engine\TypeSenseEngine</item>
             </argument>
         </arguments>
     </type>
@@ -160,8 +175,14 @@
     <type name="Magento\Search\Model\AdapterFactory">
         <arguments>
             <argument name="adapters" xsi:type="array">
-                <item name="typesense" xsi:type="string">\MageOs\TypeSense\SearchAdapter\Adapter</item>
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\SearchAdapter\Adapter</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="MageOs\TypeSense\SearchAdapter\Adapter">
+        <arguments>
+            <argument name="connectionManager" xsi:type="object">MageOs\TypeSense\SearchAdapter\ConnectionManager</argument>
         </arguments>
     </type>
 
@@ -199,28 +220,28 @@
         </arguments>
     </type>
 
-    <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">
-        <arguments>
-            <argument name="factories" xsi:type="array">
-                <item name="typesense" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>
-                <item name="default" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">-->
+<!--        <arguments>-->
+<!--            <argument name="factories" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>-->
+<!--                <item name="default" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
-    <type name="Magento\CatalogSearch\Model\Advanced\ProductCollectionPrepareStrategyProvider">
-        <arguments>
-            <argument name="strategies" xsi:type="array">
-                <item name="typesense" xsi:type="object">Magento\Elasticsearch\Model\Advanced\ProductCollectionPrepareStrategy</item>
-            </argument>
-        </arguments>
-    </type>
+<!--    <type name="Magento\CatalogSearch\Model\Advanced\ProductCollectionPrepareStrategyProvider">-->
+<!--        <arguments>-->
+<!--            <argument name="strategies" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="object">Magento\Elasticsearch\Model\Advanced\ProductCollectionPrepareStrategy</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </type>-->
 
-    <virtualType name="elasticsearchLayerSearchItemCollectionProvider" type="Magento\Elasticsearch\Model\Layer\Search\ItemCollectionProvider">
-        <arguments>
-            <argument name="factories" xsi:type="array">
-                <item name="typesense" xsi:type="object">elasticsearchFulltextSearchCollectionFactory</item>
-            </argument>
-        </arguments>
-    </virtualType>
+<!--    <virtualType name="elasticsearchLayerSearchItemCollectionProvider" type="Magento\Elasticsearch\Model\Layer\Search\ItemCollectionProvider">-->
+<!--        <arguments>-->
+<!--            <argument name="factories" xsi:type="array">-->
+<!--                <item name="typesense" xsi:type="object">elasticsearchFulltextSearchCollectionFactory</item>-->
+<!--            </argument>-->
+<!--        </arguments>-->
+<!--    </virtualType>-->
 </config>

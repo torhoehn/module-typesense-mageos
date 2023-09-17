@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace MageOs\TypeSense\Model;
+namespace MageOs\TypeSense\SearchAdapter;
 
-use Http\Client\Exception;
+use Exception;
 use Magento\AdvancedSearch\Model\Client\ClientInterface;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\InvalidArgumentException;
@@ -14,7 +14,6 @@ use MageOs\TypeSense\Data\TypeSenseConfigData;
 use MageOs\TypeSense\Exception\ConfigurationException;
 use MageOs\TypeSense\Exception\InvalidConfigurationException;
 use MageOs\TypeSense\Mapper\TypeSenseConfigDataMapper;
-use MageOs\TypeSense\SearchAdapter\DynamicTemplatesProvider;
 use TypeSense\Client;
 
 class SearchClient implements ClientInterface
@@ -29,7 +28,7 @@ class SearchClient implements ClientInterface
     public function __construct(
         private readonly TypeSenseClientBuilder $clientBuilder,
         private readonly TypeSenseConfigDataMapper $typeSenseConfigDataMapper,
-        private ?DynamicTemplatesProvider $dynamicTemplatesProvider = null,
+        protected ?DynamicTemplatesProvider $dynamicTemplatesProvider = null,
         private $fieldsMappingPreprocessors = [],
         $options = []
     ) {
@@ -80,17 +79,17 @@ class SearchClient implements ClientInterface
     }
 
     /**
-     * Ping the client
-     *
-     * @throws Exception
+     * @throws LocalizedException
      */
     public function ping(): bool
     {
         try {
             $result = $this->getTypeSenseClient()->getHealth()->retrieve();
             return $result['ok'] ?? false;
-        } catch (\Exception $e) {
-            return false;
+        } catch (Exception $e) {
+            throw new LocalizedException(
+                __('Could not ping search engine: %1', $e->getMessage())
+            );
         }
     }
 

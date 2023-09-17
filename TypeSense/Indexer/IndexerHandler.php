@@ -18,6 +18,7 @@ use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
 use Magento\Framework\Search\Request\Dimension;
 use Exception;
+use MageOs\TypeSense\SearchAdapter\Adapter as TypeSenseAdapter;
 
 class IndexerHandler implements IndexerInterface
 {
@@ -26,7 +27,7 @@ class IndexerHandler implements IndexerInterface
 
     public function __construct(
         private readonly IndexStructureInterface $indexStructure,
-        private readonly ElasticsearchAdapter $adapter,
+        private readonly TypeSenseAdapter $adapter,
         private readonly IndexNameResolver $indexNameResolver,
         private readonly Batch $batch,
         private readonly ScopeResolverInterface $scopeResolver,
@@ -46,7 +47,7 @@ class IndexerHandler implements IndexerInterface
      */
     public function saveIndex($dimensions, \Traversable $documents): IndexerInterface
     {
-        $dimension = current($dimensions);
+        $dimension = array_shift($dimensions);
         $scopeId = $this->scopeResolver->getScope($dimension->getValue())->getId();
 
         $this->batchSize = $this->deploymentConfig->get(
@@ -105,7 +106,9 @@ class IndexerHandler implements IndexerInterface
         foreach ($documents as $document) {
             $documentIds[$document] = $document;
         }
+        
         $this->adapter->deleteDocs($documentIds, $scopeId, $this->getIndexerId());
+
         return $this;
     }
 
@@ -124,13 +127,11 @@ class IndexerHandler implements IndexerInterface
     /**
      * @throws Exception
      */
-    public function updateIndex(array $dimensions, string $attributeCode): IndexerInterface
+    public function updateIndex(array $dimensions, string $attributeCode): void
     {
         $dimension = current($dimensions);
         $scopeId = (int)$this->scopeResolver->getScope($dimension->getValue())->getId();
         $this->adapter->updateIndexMapping($scopeId, $this->getIndexerId(), $attributeCode);
-
-        return $this;
     }
 
     private function getIndexerId(): string

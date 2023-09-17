@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace MageOs\TypeSense\Model;
@@ -10,22 +11,19 @@ use Magento\Framework\Search\EngineResolverInterface;
 use Magento\Store\Model\ScopeInterface;
 use function in_array;
 
-class Config implements ClientOptionsInterface {
-    const ENGINE_NAME = 'typesense';
-
+class Config implements ClientOptionsInterface
+{
+    private const ENGINE_NAME = 'typesense';
+    private const TYPESENSE_TYPE_DEFAULT = 'product';
     private string $prefix;
     private array $engineList;
 
-    /**
-     * @param string|null $prefix
-     * @param array $engineList
-     */
     public function __construct(
-        protected ScopeConfigInterface $scopeConfig,
-        private ClientResolver $clientResolver,
-        private EngineResolverInterface $engineResolver,
-        $prefix = null,
-        $engineList = []
+        private readonly ScopeConfigInterface $scopeConfig,
+        private readonly ClientResolver $clientResolver,
+        private readonly EngineResolverInterface $engineResolver,
+        ?string $prefix = null,
+        array $engineList = []
     ) {
         $this->prefix = $prefix ?: $this->clientResolver->getCurrentEngine();
         $this->engineList = $engineList;
@@ -39,6 +37,7 @@ class Config implements ClientOptionsInterface {
             'index' => $this->getTypesenseConfigData('index_prefix'),
             'api_key' => $this->getTypesenseConfigData('api_key'),
         ];
+
         $options = array_merge($defaultOptions, $options);
         $allowedOptions = array_merge(array_keys($defaultOptions), ['engine']);
 
@@ -48,27 +47,28 @@ class Config implements ClientOptionsInterface {
                 $array_filter[$key] = $item;
             }
         }
+
         return $array_filter;
     }
 
-    public function getTypesenseConfigData($field, $storeId = null)
+    public function getIndexPrefix(): string
+    {
+        return $this->getTypesenseConfigData('index_prefix');
+    }
+
+    public function getTypesenseConfigData($field, $storeId = null): string
     {
         return $this->getSearchConfigData($this->prefix . '_' . $field, $storeId);
     }
 
-    public function getSearchConfigData($field, $storeId = null)
+    public function getSearchConfigData($field, $storeId = null): string
     {
         $path = 'catalog/search/' . $field;
-        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
+        return (string)$this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     public function isTypesenseEnabled(): bool
     {
         return in_array($this->engineResolver->getCurrentSearchEngine(), $this->engineList, true);
-    }
-
-    public function getIndexPrefix()
-    {
-        return $this->getTypesenseConfigData('index_prefix');
     }
 }

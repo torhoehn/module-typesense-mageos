@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MageOs\TypeSense\Indexer;
 
-use Magento\Elasticsearch\Model\Adapter\Elasticsearch as ElasticsearchAdapter;
+use MageOs\TypeSense\SearchAdapter\Adapter as TypeSenseAdapter;
 use Magento\Framework\App\ScopeResolverInterface;
 use Magento\Framework\Indexer\IndexStructureInterface;
 
 class IndexStructure implements IndexStructureInterface
 {
     public function __construct(
-        private ElasticsearchAdapter $adapter,
-        private ScopeResolverInterface $scopeResolver
+        private readonly TypeSenseAdapter $adapter,
+        private readonly ScopeResolverInterface $scopeResolver
     ) {
     }
 
