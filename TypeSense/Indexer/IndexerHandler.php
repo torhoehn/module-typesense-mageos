@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace MageOs\TypeSense\Indexer;
 
+use Exception;
 use Magento\Catalog\Model\Category;
 use Magento\CatalogSearch\Model\Indexer\Fulltext;
 use Magento\CatalogSearch\Model\Indexer\Fulltext\Processor;
-use Magento\Elasticsearch\Model\Adapter\Elasticsearch as ElasticsearchAdapter;
-use Magento\Elasticsearch\Model\Adapter\Index\IndexNameResolver;
 use Magento\Framework\App\DeploymentConfig;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ScopeResolverInterface;
@@ -17,8 +16,8 @@ use Magento\Framework\Indexer\IndexStructureInterface;
 use Magento\Framework\Indexer\SaveHandler\Batch;
 use Magento\Framework\Indexer\SaveHandler\IndexerInterface;
 use Magento\Framework\Search\Request\Dimension;
-use Exception;
 use MageOs\TypeSense\SearchAdapter\Adapter as TypeSenseAdapter;
+use MageOs\TypeSense\SearchAdapter\SearchIndexNameResolver;
 
 class IndexerHandler implements IndexerInterface
 {
@@ -28,9 +27,9 @@ class IndexerHandler implements IndexerInterface
     public function __construct(
         private readonly IndexStructureInterface $indexStructure,
         private readonly TypeSenseAdapter $adapter,
-        private readonly IndexNameResolver $indexNameResolver,
+        private readonly SearchIndexNameResolver $indexNameResolver,
         private readonly Batch $batch,
-        private readonly ScopeResolverInterface $scopeResolver,
+        private readonly ScopeResolverInterface  $scopeResolver,
         private readonly array $data = [],
         private int $batchSize = self::DEFAULT_BATCH_SIZE,
         private ?DeploymentConfig $deploymentConfig = null,
@@ -48,7 +47,7 @@ class IndexerHandler implements IndexerInterface
     public function saveIndex($dimensions, \Traversable $documents): IndexerInterface
     {
         $dimension = array_shift($dimensions);
-        $scopeId = $this->scopeResolver->getScope($dimension->getValue())->getId();
+        $scopeId = (int)$this->scopeResolver->getScope($dimension->getValue())->getId();
 
         $this->batchSize = $this->deploymentConfig->get(
             self::DEPLOYMENT_CONFIG_INDEXER_BATCHES . Fulltext::INDEXER_ID . '/elastic_save'
@@ -106,7 +105,7 @@ class IndexerHandler implements IndexerInterface
         foreach ($documents as $document) {
             $documentIds[$document] = $document;
         }
-        
+
         $this->adapter->deleteDocs($documentIds, $scopeId, $this->getIndexerId());
 
         return $this;

@@ -14,7 +14,8 @@ use MageOs\TypeSense\Model\Config;
  */
 class DataMapperResolver implements BatchDataMapperInterface
 {
-    private BatchDataMapperInterface $dataMapperEntity;
+    /** @var array<string, BatchDataMapperInterface> */
+    private array $dataMapperEntity = [];
 
     public function __construct(private readonly DataMapperFactory $dataMapperFactory)
     {

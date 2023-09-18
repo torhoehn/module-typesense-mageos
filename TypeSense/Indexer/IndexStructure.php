@@ -19,14 +19,14 @@ class IndexStructure implements IndexStructureInterface
     public function create($indexerId, array $fields, array $dimensions = []): void
     {
         $dimension = array_shift($dimensions);
-        $scopeId = $this->scopeResolver->getScope($dimension->getValue())->getId();
+        $scopeId = (int)$this->scopeResolver->getScope($dimension->getValue())->getId();
         $this->adapter->checkIndex($scopeId, $indexerId, false);
     }
 
     public function delete($indexerId, array $dimensions = []): void
     {
         $dimension = array_shift($dimensions);
-        $scopeId = $this->scopeResolver->getScope($dimension->getValue())->getId();
+        $scopeId = (int)$this->scopeResolver->getScope($dimension->getValue())->getId();
         $this->adapter->cleanIndex($scopeId, $indexerId);
     }
 }

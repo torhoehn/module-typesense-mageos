@@ -13,8 +13,8 @@ use function in_array;
 
 class Config implements ClientOptionsInterface
 {
-    private const ENGINE_NAME = 'typesense';
-    private const TYPESENSE_TYPE_DEFAULT = 'product';
+    public const ENGINE_NAME = 'typesense';
+    public const TYPESENSE_TYPE_DEFAULT = 'product';
     private string $prefix;
     private array $engineList;
 
@@ -70,5 +70,10 @@ class Config implements ClientOptionsInterface
     public function isTypesenseEnabled(): bool
     {
         return in_array($this->engineResolver->getCurrentSearchEngine(), $this->engineList, true);
+    }
+
+    public function getEntityType(): string
+    {
+        return self::TYPESENSE_TYPE_DEFAULT;
     }
 }
