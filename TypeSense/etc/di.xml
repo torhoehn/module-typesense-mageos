@@ -114,7 +114,7 @@
     <type name="Magento\Framework\Search\Dynamic\DataProviderFactory">
         <arguments>
             <argument name="dataProviders" xsi:type="array">
-                <item name="typesense" xsi:type="string">Magento\Elasticsearch\SearchAdapter\Dynamic\DataProvider</item>
+                <item name="typesense" xsi:type="string">MageOs\TypeSense\SearchAdapter\Dynamic\DataProvider</item>
             </argument>
         </arguments>
     </type>
@@ -205,28 +205,28 @@
         </arguments>
     </type>
 
-<!--    <type name="Magento\CatalogSearch\Model\Search\ItemCollectionProvider">-->
-<!--        <arguments>-->
-<!--            <argument name="factories" xsi:type="array">-->
-<!--                <item name="typesense" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>-->
-<!--                <item name="default" xsi:type="object">elasticsearchAdvancedCollectionFactory</item>-->
-<!--            </argument>-->
-<!--        </arguments>-->
-<!--    </type>-->
+    <virtualType name="elasticsearchLayerSearchItemCollectionProvider">
+        <arguments>
+            <argument name="factories" xsi:type="array">
+                <item name="typesense" xsi:type="object">typesenseFulltextSearchCollectionFactory</item>
+            </argument>
+        </arguments>
+    </virtualType>
 
-<!--    <type name="Magento\CatalogSearch\Model\Advanced\ProductCollectionPrepareStrategyProvider">-->
-<!--        <arguments>-->
-<!--            <argument name="strategies" xsi:type="array">-->
-<!--                <item name="typesense" xsi:type="object">Magento\Elasticsearch\Model\Advanced\ProductCollectionPrepareStrategy</item>-->
-<!--            </argument>-->
-<!--        </arguments>-->
-<!--    </type>-->
+    <virtualType name="typesenseFulltextSearchCollectionFactory" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">typesenseFulltextSearchCollection</argument>
+        </arguments>
+    </virtualType>
 
-<!--    <virtualType name="elasticsearchLayerSearchItemCollectionProvider" type="Magento\Elasticsearch\Model\Layer\Search\ItemCollectionProvider">-->
-<!--        <arguments>-->
-<!--            <argument name="factories" xsi:type="array">-->
-<!--                <item name="typesense" xsi:type="object">elasticsearchFulltextSearchCollectionFactory</item>-->
-<!--            </argument>-->
-<!--        </arguments>-->
-<!--    </virtualType>-->
+    <virtualType name="typesenseFulltextSearchCollection" type="Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">typesenseFulltextSearchCollection</argument>
+            <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">typesenseSearchCriteriaResolverFactory</argument>
+            <argument name="searchResultApplierFactory" xsi:type="object">typesenseSearchResultApplier\Factory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">typesenseTotalRecordsResolver\Factory</argument>
+            <argument name="defaultFilterStrategyApplyChecker" xsi:type="object">MageOs\TypeSense\Model\ResourceModel\Fulltext\Collection\DefaultFilterStrategyApplyChecker</argument>
+        </arguments>
+    </virtualType>
 </config>
