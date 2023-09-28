@@ -19,7 +19,6 @@ use MageOs\TypeSense\Mapper\QueryMapper;
 use MageOs\TypeSense\Model\Config;
 use MageOs\TypeSense\SearchAdapter\BatchDataMapper\DataMapperResolver;
 use Psr\Log\LoggerInterface;
-use MageOS\TypeSense\SearchAdapter\ConnectionManager;
 
 class Adapter implements AdapterInterface
 {

@@ -26,7 +26,7 @@
         </arguments>
     </type>
 
-    <type name="MageOS\TypeSense\SearchAdapter\ConnectionManager">
+    <type name="MageOs\TypeSense\SearchAdapter\ConnectionManager">
         <arguments>
             <argument name="clientFactory" xsi:type="object">MageOs\TypeSense\Proxy\ClientFactoryProxy</argument>
             <argument name="clientConfig" xsi:type="object">MageOs\TypeSense\Model\Config</argument>

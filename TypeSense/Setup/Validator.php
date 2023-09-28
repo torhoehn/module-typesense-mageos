@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace MageOS\TypeSense\Setup;
+namespace MageOs\TypeSense\Setup;
 
 use Magento\AdvancedSearch\Model\Client\ClientResolver;
 use Magento\Search\Model\SearchEngine\ValidatorInterface;
